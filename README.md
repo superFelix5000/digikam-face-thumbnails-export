@@ -6,20 +6,6 @@ digiKam stores its face recognition crops in a separate thumbnails database usin
 
 ## How it works
 
-```
-digikam4.db                  ┐
-  └─ Tags / ImageTagProperties ──→ face regions per person
-                                        │
-thumbnails-digikam.db        ┐          │  match by center point
-  └─ CustomIdentifiers ──────┘──→ PGF blob
-                                        │
-                              pgf2ppm (C++)
-                                        │
-                              Pillow (Python)
-                                        ▼
-                              exported_faces/*.png
-```
-
 1. The script queries `digikam4.db` for all face regions tagged with the given person name.
 2. For each region it finds the matching face thumbnail in `thumbnails-digikam.db` (stored as a `detail://` URI in the `CustomIdentifiers` table).
 3. The raw PGF blob is piped through `pgf2ppm` (a tiny C++ program linked against `libpgf`) to produce a PPM image.
