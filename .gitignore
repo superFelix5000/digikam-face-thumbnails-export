@@ -1,0 +1,8 @@
+# Databases (contain personal data)
+*.db
+
+# Compiled binary
+pgf2ppm
+
+# Exported images
+exported_faces/
