@@ -1,0 +1,6 @@
+exported_faces/
+*.db
+*.db-wal
+*.db-shm
+pgf2ppm
+.git/

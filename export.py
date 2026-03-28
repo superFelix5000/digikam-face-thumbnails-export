@@ -189,7 +189,8 @@ def export_faces(person_name, dk_path, th_path, output_dir, pgf2ppm_bin):
             skipped += 1
             continue
 
-        out_name = f"{person_name}_{image_id}.png"
+        safe_person = re.sub(r'[^\w\-.]', '_', person_name)
+        out_name = f"{safe_person}_{image_id}.png"
         with open(os.path.join(output_dir, out_name), "wb") as f:
             f.write(png_data)
         saved += 1
@@ -237,7 +238,9 @@ examples:
     if not args.person:
         parser.error("Please provide a person name, or use --list to see available names.")
 
-    output_dir = args.output or os.path.join(script_dir, "exported_faces")
+    base_output_dir = args.output or os.path.join(script_dir, "exported_faces")
+    safe_name = re.sub(r'[^\w\-.]', '_', args.person)
+    output_dir = os.path.join(base_output_dir, safe_name)
     pgf2ppm_bin = build_pgf2ppm(script_dir)
 
     export_faces(args.person, dk_path, th_path, output_dir, pgf2ppm_bin)
