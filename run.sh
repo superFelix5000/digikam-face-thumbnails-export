@@ -124,7 +124,7 @@ cmd_dedup() {
     run_docker \
         -v "$person_dir:/output" \
         "$IMAGE" \
-        bash -c 'findimagedupes /output/*.png | python3 /app/dedup.py "$@"' _ "$@"
+        bash -c 'set -euo pipefail; shopt -s nullglob; findimagedupes /output/*.png | python3 /app/dedup.py "$@"' _ "$@"
 }
 
 cmd_all() {
@@ -146,7 +146,8 @@ cmd_all() {
         -v "$OUTPUT_DIR:/output" \
         "$IMAGE" \
         bash -c '
-            set -e
+            set -euo pipefail
+            shopt -s nullglob
             python3 /app/export.py -d /db -o /output "$1"
             findimagedupes /output/"$2"/*.png 2>/dev/null \
                 | python3 /app/dedup.py

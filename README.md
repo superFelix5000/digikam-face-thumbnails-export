@@ -201,7 +201,7 @@ When you export several people into the same `exported_faces/` folder, running `
 - Use `./run.sh all "Name"` which automatically scopes dedup to that person's files.
 - Or run `findimagedupes` manually with a name-prefixed glob:
   ```bash
-  findimagedupes exported_faces/John_Doe_*.png | python3 dedup.py
+  findimagedupes "exported_faces/John_Doe/*.png" | python3 dedup.py
   ```
 
 ---

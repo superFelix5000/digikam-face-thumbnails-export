@@ -9,15 +9,22 @@ import argparse
 def parse_line(line):
     """Parse a findimagedupes output line into individual file paths.
 
-    Paths are absolute and may contain spaces, so we split on ' /' boundaries
-    (a space followed by '/') which reliably separates them.
+    Supports both:
+    - Absolute paths that may contain spaces, separated by ' /' (space + '/')
+    - Relative paths without spaces, separated by whitespace
     """
     line = line.strip()
     if not line:
         return []
 
-    parts = line.split(" /")
-    paths = [parts[0]] + ["/" + p for p in parts[1:]]
+    if " /" in line:
+        # Absolute paths case: paths may contain spaces, so split on " /"
+        parts = line.split(" /")
+        paths = [parts[0]] + ["/" + p for p in parts[1:]]
+    else:
+        # Relative paths case: filenames are assumed not to contain spaces,
+        # so we can safely split on whitespace.
+        paths = line.split()
 
     # Filter out bare directories (entries ending with '/')
     return [p for p in paths if not p.endswith("/")]
@@ -68,6 +75,7 @@ def main():
         for f in to_delete:
             if args.dry_run:
                 print(f"  Would delete: {f}")
+                total_deleted += 1
             else:
                 try:
                     os.remove(f)
