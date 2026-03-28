@@ -40,6 +40,37 @@ detect_db_dir() {
 DB_DIR="$(detect_db_dir)"
 
 # ---------------------------------------------------------------------------
+# Validate that the DB directory contains usable databases
+# ---------------------------------------------------------------------------
+check_db_dir() {
+    local missing=()
+    for f in digikam4.db thumbnails-digikam.db; do
+        if [[ ! -s "$DB_DIR/$f" ]]; then
+            missing+=("$f")
+        fi
+    done
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "Error: Missing or empty database(s) in $DB_DIR:" >&2
+        for f in "${missing[@]}"; do
+            echo "  - $f" >&2
+        done
+        cat >&2 <<EOF
+
+Set DIGIKAM_DB_DIR to the directory that contains your digiKam databases:
+
+  export DIGIKAM_DB_DIR=/path/to/your/digikam/databases
+  $0 ${1:-list}
+
+Common locations:
+  Linux:        ~/.local/share/digikam
+  macOS:        ~/Library/Containers/org.kde.digikam/Data/share/digikam
+  Windows/WSL:  /mnt/c/Users/<you>/AppData/Roaming/digikam
+EOF
+        exit 1
+    fi
+}
+
+# ---------------------------------------------------------------------------
 # Common docker-run flags
 # ---------------------------------------------------------------------------
 run_docker() {
@@ -56,6 +87,7 @@ cmd_build() {
 }
 
 cmd_list() {
+    check_db_dir list
     run_docker \
         -v "$DB_DIR:/db:ro" \
         "$IMAGE" \
@@ -67,6 +99,7 @@ cmd_export() {
         echo "Usage: $0 export \"Person Name\" [extra export.py flags...]" >&2
         exit 1
     fi
+    check_db_dir export
     mkdir -p "$OUTPUT_DIR"
     run_docker \
         -v "$DB_DIR:/db:ro" \
@@ -91,6 +124,7 @@ cmd_all() {
         echo "Usage: $0 all \"Person Name\"" >&2
         exit 1
     fi
+    check_db_dir all
     local person="$1"
     shift
     mkdir -p "$OUTPUT_DIR"
