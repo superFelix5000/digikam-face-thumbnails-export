@@ -109,12 +109,20 @@ cmd_export() {
 }
 
 cmd_dedup() {
-    if [[ ! -d "$OUTPUT_DIR" ]]; then
-        echo "No exported_faces/ directory found. Run 'export' first." >&2
+    if [[ $# -lt 1 ]]; then
+        echo "Usage: $0 dedup \"Person Name\" [extra dedup flags...]" >&2
+        exit 1
+    fi
+    local person="$1"; shift
+    local prefix
+    prefix="$(echo "$person" | sed 's/[^[:alnum:]._-]/_/g')"
+    local person_dir="$OUTPUT_DIR/$prefix"
+    if [[ ! -d "$person_dir" ]]; then
+        echo "No exported_faces/$prefix/ directory found. Run 'export' first." >&2
         exit 1
     fi
     run_docker \
-        -v "$OUTPUT_DIR:/output" \
+        -v "$person_dir:/output" \
         "$IMAGE" \
         bash -c 'findimagedupes /output/*.png | python3 /app/dedup.py "$@"' _ "$@"
 }
@@ -129,9 +137,9 @@ cmd_all() {
     shift
     mkdir -p "$OUTPUT_DIR"
 
-    # Sanitise person name to match the filename prefix export.py produces
+    # Sanitise person name to match the subdirectory export.py produces
     local prefix
-    prefix="$(echo "$person" | tr ' ' '_')"
+    prefix="$(echo "$person" | sed 's/[^[:alnum:]._-]/_/g')"
 
     run_docker \
         -v "$DB_DIR:/db:ro" \
@@ -140,7 +148,7 @@ cmd_all() {
         bash -c '
             set -e
             python3 /app/export.py -d /db -o /output "$1"
-            findimagedupes /output/"$2"_*.png 2>/dev/null \
+            findimagedupes /output/"$2"/*.png 2>/dev/null \
                 | python3 /app/dedup.py
         ' _ "$person" "$prefix"
 }
@@ -153,7 +161,7 @@ Commands:
   build                         Build the Docker image
   list                          List all persons with face data
   export "Person Name" [flags]  Export face thumbnails for a person
-  dedup  [--dry-run] [--keep first|last]
+  dedup  "Person Name" [--dry-run] [--keep first|last]
                                 Find and remove duplicate exported faces
   all    "Person Name"          Export faces then deduplicate (scoped to that person)
   help                          Show this help message

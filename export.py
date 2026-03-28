@@ -237,7 +237,9 @@ examples:
     if not args.person:
         parser.error("Please provide a person name, or use --list to see available names.")
 
-    output_dir = args.output or os.path.join(script_dir, "exported_faces")
+    base_output_dir = args.output or os.path.join(script_dir, "exported_faces")
+    safe_name = re.sub(r'[^\w\-.]', '_', args.person)
+    output_dir = os.path.join(base_output_dir, safe_name)
     pgf2ppm_bin = build_pgf2ppm(script_dir)
 
     export_faces(args.person, dk_path, th_path, output_dir, pgf2ppm_bin)
