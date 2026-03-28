@@ -1,4 +1,4 @@
-# digikam-face-export
+# digikam-face-thumbnails-export
 
 Export face thumbnails for a specific person from [digiKam](https://www.digikam.org/)'s SQLite databases as PNG files.
 
