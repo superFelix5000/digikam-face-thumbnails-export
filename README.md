@@ -62,20 +62,20 @@ export DIGIKAM_DB_DIR=/path/to/your/digikam/databases
 ./run.sh export "John Doe"
 ```
 
-PNGs are written to `./exported_faces/`.
+PNGs are written to `./exported_faces/John_Doe/`.
 
 ### 6. Remove duplicates
 
 Always preview first with `--dry-run`:
 
 ```bash
-./run.sh dedup --dry-run
+./run.sh dedup "John Doe" --dry-run
 ```
 
 Then delete the duplicates:
 
 ```bash
-./run.sh dedup
+./run.sh dedup "John Doe"
 ```
 
 Or do export + dedup in one step (dedup is automatically scoped to the exported person):
@@ -91,7 +91,7 @@ Or do export + dedup in one step (dedup is automatically scoped to the exported 
 | `./run.sh build` | Build the Docker image |
 | `./run.sh list` | List all persons with face data |
 | `./run.sh export "Name" [flags]` | Export face thumbnails for a person |
-| `./run.sh dedup [--dry-run] [--keep first\|last]` | Find and remove duplicate exported faces |
+| `./run.sh dedup "Name" [--dry-run] [--keep first\|last]` | Find and remove duplicate exported faces |
 | `./run.sh all "Name"` | Export + deduplicate in one step |
 | `./run.sh help` | Show usage and detected DB path |
 
@@ -148,16 +148,16 @@ python3 export.py --list
 python3 export.py "John Doe"
 ```
 
-PNGs will be written to `./exported_faces/`. The `pgf2ppm` helper is compiled automatically on first run.
+PNGs will be written to `./exported_faces/John_Doe/`. The `pgf2ppm` helper is compiled automatically on first run.
 
 ### 6. Remove duplicates
 
 ```bash
 # Preview what would be deleted
-findimagedupes exported_faces/*.png | python3 dedup.py --dry-run
+findimagedupes "exported_faces/John_Doe/*.png" | python3 dedup.py --dry-run
 
 # Actually delete duplicates
-findimagedupes exported_faces/*.png | python3 dedup.py
+findimagedupes "exported_faces/John_Doe/*.png" | python3 dedup.py
 ```
 
 ### export.py options

@@ -189,7 +189,8 @@ def export_faces(person_name, dk_path, th_path, output_dir, pgf2ppm_bin):
             skipped += 1
             continue
 
-        out_name = f"{person_name}_{image_id}.png"
+        safe_person = re.sub(r'[^\w\-.]', '_', person_name)
+        out_name = f"{safe_person}_{image_id}.png"
         with open(os.path.join(output_dir, out_name), "wb") as f:
             f.write(png_data)
         saved += 1
